@@ -1,5 +1,5 @@
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, INTEGER, VARCHAR, PrimaryKeyConstraint, UniqueConstraint
+from sqlalchemy import Column, INTEGER, VARCHAR, PrimaryKeyConstraint, UniqueConstraint, ForeignKey
 
 Base = declarative_base()
 
@@ -17,8 +17,34 @@ class User(Base):
     last_post_time = Column('last_post_time', VARCHAR(200), nullable=False)
 
     PrimaryKeyConstraint(id, name='PK_Group_Id')
-    UniqueConstraint(login, name="UQ_User_login")
-    UniqueConstraint(vk_token, name="UQ_User_vk_token")
-    UniqueConstraint(epn_token, name="UQ_User_epn_token")
+    UniqueConstraint(login, name="UQ_User_Login")
+    UniqueConstraint(vk_token, name="UQ_User_Vk_token")
+    UniqueConstraint(epn_token, name="UQ_User_Epn_token")
+
+
+class Group(Base):
+    __tablename__ = 'group'
+
+    id = Column('id', INTEGER, autoincrement=True)
+    vk_group_id = Column('vk_group_id', INTEGER, nullable=False)
+    user_id = Column('user_id', INTEGER, ForeignKey("user.id"), nullable=False)
+
+    PrimaryKeyConstraint(id, name='PK_Group_Id')
+    UniqueConstraint(vk_group_id, name="UQ_Group_Group_id")
+
+
+class Link(Base):
+    __tablename__ = "link"
+
+    id = Column('id', INTEGER, autoincrement=True)
+    image = Column('image', VARCHAR(1000), nullable=False)
+    title = Column('title', VARCHAR(1000), nullable=False)
+    url = Column('url', VARCHAR(1000), nullable=False)
+    group_id = Column('group_id', INTEGER, ForeignKey("group.id"), nullable=False)
+
+    PrimaryKeyConstraint(id, name="PK_Link_Id")
+    UniqueConstraint(url, name="UQ_Link_Url")
+
+
 
 
