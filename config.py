@@ -1,1 +1,0 @@
-POSTGRE_URI = "URI"

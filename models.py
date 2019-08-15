@@ -8,7 +8,7 @@ class User(Base):
     __tablename__ = 'user'
 
     id = Column('id', INTEGER, autoincrement=True)
-    login = Column('login', VARCHAR(30), nullable=False)
+    login = Column('login', VARCHAR(50), nullable=False)
     password = Column('password', VARCHAR(50), nullable=False)
     vk_token = Column('vk_token', VARCHAR(200), nullable=False)
     epn_token = Column('epn_token', VARCHAR(200), nullable=False)
@@ -52,10 +52,14 @@ class Link(Base):
 
 if __name__ == "__main__":
     from sqlalchemy import create_engine
-    from config import POSTGRE_URI
     from sqlalchemy.orm import sessionmaker
+    import json
 
-    engine = create_engine(POSTGRE_URI)
+    with open('config.json') as json_file:
+        db_data = json.load(json_file)["postgresql"]
+
+    engine = create_engine(f"postgresql://{db_data['user']}:{db_data['password']}@{db_data['host']}:{db_data['port']}/"
+                           f"{db_data['db']}")
     Base.metadata.create_all(bind=engine)
 
     Session = sessionmaker(bind=engine)

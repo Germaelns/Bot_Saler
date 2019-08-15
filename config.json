@@ -1,0 +1,9 @@
+{
+    "postgresql":{
+        "host":"localhost",
+        "user":"root",
+        "password":"password",
+        "db":"write-math",
+        "port":2000
+    }
+}
