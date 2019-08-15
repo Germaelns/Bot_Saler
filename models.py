@@ -40,6 +40,8 @@ class Link(Base):
     image = Column('image', VARCHAR(1000), nullable=False)
     title = Column('title', VARCHAR(1000), nullable=False)
     url = Column('url', VARCHAR(1000), nullable=False)
+    price = Column('price', INTEGER, nullable=False)
+    sale = Column('sale', INTEGER, nullable=False)
     group_id = Column('group_id', INTEGER, ForeignKey("group.id"), nullable=False)
 
     PrimaryKeyConstraint(id, name="PK_Link_Id")
