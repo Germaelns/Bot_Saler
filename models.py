@@ -15,6 +15,8 @@ class User(Base):
     start_timer = Column('start_timer', VARCHAR(5), nullable=False)
     end_timer = Column('end_timer', VARCHAR(5), nullable=False)
     last_post_time = Column('last_post_time', VARCHAR(200), nullable=False)
+    post_iteration_counter = Column('post_iteration_counter', INTEGER, nullable=False)
+    post_iteration = Column('post_iteration', INTEGER, nullable=False)
 
     PrimaryKeyConstraint(id, name='PK_Group_Id')
     UniqueConstraint(login, name="UQ_User_Login")
@@ -46,6 +48,22 @@ class Link(Base):
 
     PrimaryKeyConstraint(id, name="PK_Link_Id")
     UniqueConstraint(url, name="UQ_Link_Url")
+
+
+if __name__ == "__main__":
+    from sqlalchemy import create_engine
+    from config import POSTGRE_URI
+    from sqlalchemy.orm import sessionmaker
+
+    engine = create_engine(POSTGRE_URI)
+    Base.metadata.create_all(bind=engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
+
+    session.add(User(login='admin', ))
+    session.commit()
+    session.close()
 
 
 
