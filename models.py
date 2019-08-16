@@ -59,16 +59,16 @@ if __name__ == "__main__":
     with open('config.json') as json_file:
         db_data = json.load(json_file)["postgresql"]
 
-    engine = create_engine(f"postgresql://{db_data['user']}:{db_data['password']}@{db_data['host']}:{db_data['port']}/"
-                           f"{db_data['db']}")
-    Base.metadata.create_all(bind=engine)
-
+    # engine = create_engine(f"postgresql://{db_data['user']}:{db_data['password']}@{db_data['host']}:{db_data['port']}/"
+    #                        f"{db_data['db']}")
+    # Base.metadata.create_all(bind=engine)
+    #
     # Session = sessionmaker(bind=engine)
     # session = Session()
     #
-    # session.add(User(login='admin', password="admin", tg_channel="@channel", vk_token="vk_token", epn_token="epn_token",
-    #                  start_timer='9', end_timer="21", last_post_time="2321432545", post_iteration_counter=21,
-    #                  post_iteration=2))
+    # session.add(User(login='admin', password="admin", tg_channel="@channel", vk_token="vk_token",
+    #                  epn_token="epn_token", start_timer='9', end_timer="21", last_post_time="2321432545",
+    #                  post_iteration_counter=21, post_iteration=2))
     # session.add(Group(vk_group_id="-34567", user_id=1))
     # session.add(Link(image="image", title="easy_image", url="simple_url", price=254.24, sale=24, group_id=1))
     # session.commit()
