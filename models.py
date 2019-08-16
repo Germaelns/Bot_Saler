@@ -13,8 +13,8 @@ class User(Base):
     tg_channel = Column('tg_channel', VARCHAR(30), nullable=False)
     vk_token = Column('vk_token', VARCHAR(200), nullable=False)
     epn_token = Column('epn_token', VARCHAR(200), nullable=False)
-    start_timer = Column('start_timer', VARCHAR(5), nullable=False)
-    end_timer = Column('end_timer', VARCHAR(5), nullable=False)
+    start_timer = Column('start_timer', INTEGER, nullable=False)
+    end_timer = Column('end_timer', INTEGER, nullable=False)
     last_post_time = Column('last_post_time', VARCHAR(200), nullable=False)
     post_iteration_counter = Column('post_iteration_counter', INTEGER, nullable=False)
     post_iteration = Column('post_iteration', INTEGER, nullable=False)
@@ -33,7 +33,6 @@ class Group(Base):
     user_id = Column('user_id', INTEGER, ForeignKey("user.id"), nullable=False)
 
     PrimaryKeyConstraint(id, name='PK_Group_Id')
-    UniqueConstraint(vk_group_id, name="UQ_Group_Group_id")
 
 
 class Link(Base):
@@ -46,6 +45,7 @@ class Link(Base):
     price = Column('price', FLOAT, nullable=False)
     sale = Column('sale', INTEGER, nullable=False)
     group_id = Column('group_id', INTEGER, ForeignKey("group.id"), nullable=False)
+    user_id = Column('user_id', INTEGER, ForeignKey("user.id"), nullable=False)
 
     PrimaryKeyConstraint(id, name="PK_Link_Id")
     UniqueConstraint(url, name="UQ_Link_Url")
@@ -59,20 +59,20 @@ if __name__ == "__main__":
     with open('config.json') as json_file:
         db_data = json.load(json_file)["postgresql"]
 
-    # engine = create_engine(f"postgresql://{db_data['user']}:{db_data['password']}@{db_data['host']}:{db_data['port']}/"
-    #                        f"{db_data['db']}")
-    # Base.metadata.create_all(bind=engine)
-    #
-    # Session = sessionmaker(bind=engine)
-    # session = Session()
+    engine = create_engine(f"postgresql://{db_data['user']}:{db_data['password']}@{db_data['host']}:{db_data['port']}/"
+                           f"{db_data['db']}")
+    Base.metadata.create_all(bind=engine)
+
+    Session = sessionmaker(bind=engine)
+    session = Session()
     #
     # session.add(User(login='admin', password="admin", tg_channel="@channel", vk_token="vk_token",
     #                  epn_token="epn_token", start_timer='9', end_timer="21", last_post_time="2321432545",
     #                  post_iteration_counter=21, post_iteration=2))
     # session.add(Group(vk_group_id="-34567", user_id=1))
     # session.add(Link(image="image", title="easy_image", url="simple_url", price=254.24, sale=24, group_id=1))
-    # session.commit()
-    # session.close()
+    session.commit()
+    session.close()
 
 
 
