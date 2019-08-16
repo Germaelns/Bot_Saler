@@ -1,6 +1,30 @@
 import models
 
 
+class DatabaseGetData:
+
+    def __init__(self, db_session):
+        self.session = db_session
+
+    def get_user(self, login):
+        return self.session.query(models.User).filter(models.User.login == login).one()
+
+    def get_group(self, vk_group_id: str, user_id: int):
+        return self.session.query(models.Group).filter(models.Group.vk_group_id == vk_group_id
+                                                       and user_id == user_id).one()
+
+    def get_link(self, group_id: int, user_id: int):
+        return self.session.query(models.Link).filter(models.Link.user_id == user_id
+                                                      and models.Link.group_id == group_id).all()[0]
+
+    def get_all_groups(self, user_id: int) -> list:
+        return self.session.query(models.Group).filter(models.Group.user_id == user_id).all()
+
+    def get_all_links(self, group_id: int, user_id: int) -> list:
+        return self.session.query(models.Link).filter(models.Link.user_id == user_id
+                                                      and models.Link.group_id == group_id).all()
+
+
 class DatabaseAddData:
 
     def __init__(self, db_session):
@@ -26,8 +50,8 @@ class DatabaseDeleteData:
     def __init__(self, db_session):
         self.session = db_session
 
-    def delete_link(self, link_id: int):
-        return self.session.query(models.Link).filter(models.Link.id == link_id).delete()
+    def delete_link(self, del_link):
+        return self.session.delete(del_link)
 
     def delete_group(self, group_id: int):
         self.session.query(models.Link).filter(models.Link.group_id == group_id).delete()
@@ -43,29 +67,36 @@ class DatabaseDeleteData:
 
 class DatabaseUpdateData:
 
-    def __init__(self, db_session):
-        self.session = db_session
+    def __init__(self, user):
+        self.user = user
 
-    def update_password(self, user_id: int, new_password: str):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'password': new_password})
+    def update_password(self, new_password: str):
+        self.user.password = new_password
+        return 0
 
-    def update_channel(self, user_id, new_channel: str):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'tg_channel': new_channel})
+    def update_channel(self, new_channel: str):
+        self.user.tg_channel = new_channel
+        return 0
 
-    def update_vk_token(self, user_id, new_vk_token: str):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'vk_token': new_vk_token})
+    def update_vk_token(self, new_vk_token: str):
+        self.user.vk_token = new_vk_token
+        return 0
 
-    def update_epn_token(self, user_id, new_epn_token: str):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'epn_token': new_epn_token})
+    def update_epn_token(self, new_epn_token: str):
+        self.user.epn_token = new_epn_token
+        return 0
 
-    def update_start_timer(self, user_id, new_start_timer: int):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'start_timer': new_start_timer})
+    def update_start_timer(self, new_start_timer: int):
+        self.user.start_timer = new_start_timer
+        return 0
 
-    def update_end_timer(self, user_id, new_end_timer: int):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'end_timer': new_end_timer})
+    def update_end_timer(self, new_end_timer: int):
+        self.user.end_timer = new_end_timer
+        return 0
 
-    def update_post_iteration(self, user_id, new_post_iteration: int):
-        return self.session.query(models.User).filter(models.User.id == user_id).update({'post_iteration': new_post_iteration})
+    def update_post_iteration(self, new_post_iteration: int):
+        self.user.post_iteration = new_post_iteration
+        return 0
 
 
 if __name__ == "__main__":
@@ -84,22 +115,19 @@ if __name__ == "__main__":
 
     # db = DatabaseAddData(session)
     # db.add_user("admin", "admin", "@channel", "3353241", "43334631", 9, 21)
-    # db.add_group("-56234345", 4)
-    # db.add_link("image_url1", "title_url2", "item_url3", 42.6, 20, 4, 3)
+    # db.add_group("-56234345", 6)
+    # db.add_link("image_url1", "title_url2", "item_url3", 42.6, 20, 8, 6)
 
     # db = DatabaseDeleteData(session)
     # db.delete_user(1)
     # db.delete_link(1)
     # db.delete_group(1)
 
-    # db = DatabaseUpdateData(session)
-    # db.update_channel(6, "new_channel")
-    # db.update_password(6, "new_password")
-    # db.update_vk_token(6, "new_vk_token")
-    # db.update_epn_token(6, "new_epn_token")
-    # db.update_start_timer(6, 7)
-    # db.update_end_timer(6, 19)
-    # db.update_post_iteration(6, 2)
+    db = DatabaseGetData(session)
+    user = db.get_user("admin")
+
+    db = DatabaseUpdateData(user)
+    db.update_password("567")
 
     session.commit()
     session.close()

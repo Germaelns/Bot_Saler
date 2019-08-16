@@ -1,9 +1,0 @@
-{
-    "postgresql":{
-        "host":"ec2-54-247-85-251.eu-west-1.compute.amazonaws.com",
-        "user":"gyqtqnsgpvfihu",
-        "password":"c6fc2495e51a16c0bdce7235ebfa1ec4404070c5638d003f5b7fc0c862fff7f4",
-        "db":"d1a9ji2mk2nurl",
-        "port":5432
-    }
-}
