@@ -41,6 +41,33 @@ class DatabaseDeleteData:
         return 0
 
 
+class DatabaseUpdateData:
+
+    def __init__(self, db_session):
+        self.session = db_session
+
+    def update_password(self, user_id: int, new_password: str):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'password': new_password})
+
+    def update_channel(self, user_id, new_channel: str):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'tg_channel': new_channel})
+
+    def update_vk_token(self, user_id, new_vk_token: str):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'vk_token': new_vk_token})
+
+    def update_epn_token(self, user_id, new_epn_token: str):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'epn_token': new_epn_token})
+
+    def update_start_timer(self, user_id, new_start_timer: int):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'start_timer': new_start_timer})
+
+    def update_end_timer(self, user_id, new_end_timer: int):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'end_timer': new_end_timer})
+
+    def update_post_iteration(self, user_id, new_post_iteration: int):
+        return self.session.query(models.User).filter(models.User.id == user_id).update({'post_iteration': new_post_iteration})
+
+
 if __name__ == "__main__":
     import json
     from sqlalchemy import create_engine
@@ -56,14 +83,23 @@ if __name__ == "__main__":
     session = Session()
 
     # db = DatabaseAddData(session)
-    # db.add_user("admin3", "admin1", "@channel1", "3353241", "43334631", 9, 21)
+    # db.add_user("admin", "admin", "@channel", "3353241", "43334631", 9, 21)
     # db.add_group("-56234345", 4)
     # db.add_link("image_url1", "title_url2", "item_url3", 42.6, 20, 4, 3)
 
     # db = DatabaseDeleteData(session)
-    # db.delete_user(3)
+    # db.delete_user(1)
     # db.delete_link(1)
     # db.delete_group(1)
+
+    # db = DatabaseUpdateData(session)
+    # db.update_channel(6, "new_channel")
+    # db.update_password(6, "new_password")
+    # db.update_vk_token(6, "new_vk_token")
+    # db.update_epn_token(6, "new_epn_token")
+    # db.update_start_timer(6, 7)
+    # db.update_end_timer(6, 19)
+    # db.update_post_iteration(6, 2)
 
     session.commit()
     session.close()
