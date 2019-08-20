@@ -1,7 +1,5 @@
-from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, INTEGER, VARCHAR, PrimaryKeyConstraint, UniqueConstraint, ForeignKey, FLOAT
-
-Base = declarative_base()
+from DAL.meta import Base
 
 
 class Link(Base):

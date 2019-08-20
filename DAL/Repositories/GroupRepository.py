@@ -7,8 +7,8 @@ class GroupRepository:
     def __init__(self, db_session):
         self.session = db_session
 
-    def add_group(self, vk_group_id: str, user_id: int):
-        return self.session.add(Group(vk_group_id=vk_group_id, user_id=user_id))
+    def add_group(self, name: str, vk_group_id: str, user_id: int):
+        return self.session.add(Group(name=name, vk_group_id=vk_group_id, user_id=user_id))
 
     def get_group(self, vk_group_id: str, user_id: int):
         return self.session.query(Group).filter(Group.vk_group_id == vk_group_id

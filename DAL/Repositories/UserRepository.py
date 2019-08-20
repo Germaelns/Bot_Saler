@@ -26,28 +26,28 @@ class UserRepository:
 
     def update_user_password(self, user_data, new_password: str):
         user_data.password = new_password
-        return 0
+        return user_data
 
     def update_user_channel(self, user_data, new_channel: str):
         user_data.tg_channel = new_channel
-        return 0
+        return user_data
 
     def update_user_vk_token(self, user_data, new_vk_token: str):
         user_data.vk_token = new_vk_token
-        return 0
+        return user_data
 
     def update_user_epn_token(self, user_data, new_epn_token: str):
         user_data.epn_token = new_epn_token
-        return 0
+        return user_data
 
     def update_user_start_timer(self, user_data, new_start_timer: int):
         user_data.start_timer = new_start_timer
-        return 0
+        return user_data
 
     def update_user_end_timer(self, user_data, new_end_timer: int):
         user_data.end_timer = new_end_timer
-        return 0
+        return user_data
 
     def update_user_post_iteration(self, user_data, new_post_iteration: int):
         user_data.post_iteration = new_post_iteration
-        return 0
+        return user_data
