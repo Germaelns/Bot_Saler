@@ -36,7 +36,7 @@ class EPNService:
         return data
 
     @staticmethod
-    def send_request(user, vk_items):
+    def send_request(user, vk_items: list):
 
         data = EPNService.build_request_data(user, vk_items)
         headers = {
@@ -54,12 +54,19 @@ class EPNService:
         counter = 0
         for item in responce.json()["results"]:
 
+            sale = (responce.json()["results"]["rq_" + str(counter)]["offer"]["sale_price"] / responce.json()["results"]["rq_" + str(counter)]["offer"]["price"])
+
+            if sale < 0.1:
+                sale = int(sale*10)
+            elif sale > 0.1:
+                sale = int(sale*100)
+
             deeplink = {
                 "image": responce.json()["results"]["rq_" + str(counter)]["offer"]["picture"],
                 "title": vk_items[counter][0],
                 "url": responce.json()["results"]["rq_" + str(counter)]["offer"]["url"],
                 "price": responce.json()["results"]["rq_" + str(counter)]["offer"]["sale_price"],
-                "sale": int((responce.json()["results"]["rq_" + str(counter)]["offer"]["sale_price"] / responce.json()["results"]["rq_" + str(counter)]["offer"]["price"]) * 100),
+                "sale": sale,
                 "group_id": self.group.id,
                 "user_id": self.group.user_id
             }
