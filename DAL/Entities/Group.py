@@ -2,7 +2,6 @@ from sqlalchemy import Column, INTEGER, VARCHAR, PrimaryKeyConstraint, ForeignKe
 from DAL.meta import Base
 
 
-
 class Group(Base):
     __tablename__ = 'group'
 

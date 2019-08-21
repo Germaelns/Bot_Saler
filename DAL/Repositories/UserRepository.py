@@ -8,11 +8,11 @@ class UserRepository:
     def __init__(self, db_session):
         self.session = db_session
 
-    def add_user(self, login: str, password: str, tg_channel: str, vk_token: str, epn_token: str, start_timer: int,
-                 end_timer: int):
+    def add_user(self, login: str, password: str, tg_channel: str, vk_token: str, epn_api_token: str, epn_hash: str,
+                 start_timer: int, end_timer: int):
         return self.session.add(User(login=login, password=password, tg_channel=tg_channel, vk_token=vk_token,
-                                     epn_token=epn_token, start_timer=start_timer, end_timer=end_timer,
-                                     last_post_time="0",
+                                     epn_api_token=epn_api_token, epn_hash=epn_hash, start_timer=start_timer,
+                                     end_timer=end_timer, last_post_time="0",
                                      post_iteration_counter=0, post_iteration=0))
 
     def get_user(self, login: str):
