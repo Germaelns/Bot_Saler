@@ -17,7 +17,9 @@ class TGService:
         markup.add(btn_my_site)
 
         bot.send_photo(chat_id=self.user.tg_channel, photo=self.post_data[""],
-                       caption=f"\n {self.post_data['title']}\n\nЦена: {self.post_data['price']}\n"
-                               f"Скидка: {str(self.post_data['sale'])}%", reply_markup=markup)
+                       caption=f"\n {self.post_data['title']}\n\n"
+                               f"Цена: {self.post_data['price']}\n"
+                               f"Скидка: {str(self.post_data['sale'])}%",
+                       reply_markup=markup)
 
         return 0

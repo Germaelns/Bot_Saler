@@ -2,6 +2,7 @@ import requests
 import json
 from BLL.Exeptions.EpnWrongAuthException import EpnWrongAuthException
 from BLL.Exeptions.EpnOfferNotFoundException import EpnOfferNotFoundException
+from BLL.Exeptions.EpnBadDeeplinkHashException import EpnBadDeeplinkHashException
 
 
 class EPNService:
@@ -45,17 +46,47 @@ class EPNService:
             'Content-Type': 'application/json'
         }
 
-        response = requests.post("http://api.epn.bz/json", data=json.dumps(data), headers=headers)
+        response = requests.post("http://api.epn.bz/json",
+                                 data=json.dumps(data),
+                                 headers=headers)
 
-        print(response.status_code)
+        print(response.json())
 
         if "error" in response.json():
             if response.json()["error"] == 'Bad auth data!':
                 raise EpnWrongAuthException("Wrong auth data!")
-            # if "rq_0" in response.json():
-            #     print("ok")
-            #     if response.json()["result"]["rq_0"]["error"] == 'Offer not found':
-            #         raise EpnOfferNotFoundException("Offer not found!")
+            elif response.json()["error"] == 'Bad deeplink hash!':
+                raise EpnBadDeeplinkHashException("Bad deeplink hash!")
+
+        return response.json()
+
+    @staticmethod
+    def __deeplink_customization(group_id, user_id, vk_items, response, counter):
+
+        if "error" in response["results"]["rq_" + str(counter)]:
+            print("error")
+            if response["results"]["rq_" + str(counter)]["error"] == "Offer not found":
+                raise EpnOfferNotFoundException("No such offer on Aliexpress!")
+
+        sale = (response["results"]["rq_" + str(counter)]["offer"]["sale_price"] /
+                response["results"]["rq_" + str(counter)]["offer"]["price"])
+
+        if sale < 0.1:
+            sale = int(sale * 10)
+        elif sale >= 0.1:
+            sale = int(sale * 100)
+
+        deeplink = {
+            "image": response["results"]["rq_" + str(counter)]["offer"]["picture"],
+            "title": vk_items[counter][0],
+            "url": response["results"]["rq_" + str(counter)]["offer"]["url"],
+            "price": response["results"]["rq_" + str(counter)]["offer"]["sale_price"],
+            "sale": sale,
+            "group_id": group_id,
+            "user_id": user_id
+        }
+
+        return deeplink
 
     def create_deeplinks(self, vk_items: list):
 
@@ -64,26 +95,17 @@ class EPNService:
         deeplinks = list()
 
         counter = 0
-        for item in response.json()["results"]:
+        for item in response["results"]:
 
-            sale = (response.json()["results"]["rq_" + str(counter)]["offer"]["sale_price"] / response.json()["results"]["rq_" + str(counter)]["offer"]["price"])
+            try:
+                deeplinks.append(
+                    EPNService.__deeplink_customization(self.group.id, self.group.user_id, vk_items, response,
+                                                        counter))
+            except EpnOfferNotFoundException as e:
+                print(e.message + "for user" + self.group.user_id)
+            except Exception as e:
+                print("EPNService.create_deeplinks error")
 
-            if sale < 0.1:
-                sale = int(sale * 10)
-            elif sale >= 0.1:
-                sale = int(sale * 100)
-
-            deeplink = {
-                "image": response.json()["results"]["rq_" + str(counter)]["offer"]["picture"],
-                "title": vk_items[counter][0],
-                "url": response.json()["results"]["rq_" + str(counter)]["offer"]["url"],
-                "price": response.json()["results"]["rq_" + str(counter)]["offer"]["sale_price"],
-                "sale": sale,
-                "group_id": self.group.id,
-                "user_id": self.group.user_id
-            }
-
-            deeplinks.append(deeplink)
             counter = + 1
 
         return deeplinks

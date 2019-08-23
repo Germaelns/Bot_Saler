@@ -1,4 +1,4 @@
-from sqlalchemy import Column, INTEGER, VARCHAR, PrimaryKeyConstraint, UniqueConstraint
+from sqlalchemy import Column, INTEGER, VARCHAR, PrimaryKeyConstraint, UniqueConstraint, BOOLEAN
 from DAL.meta import Base
 
 
@@ -9,6 +9,7 @@ class User(Base):
     login = Column('login', VARCHAR(50), nullable=False)
     password = Column('password', VARCHAR(50), nullable=False)
     tg_channel = Column('tg_channel', VARCHAR(30), nullable=False)
+    active = Column('active', BOOLEAN, nullable=False)
     vk_token = Column('vk_token', VARCHAR(200), nullable=False)
     epn_api_token = Column('epn_api_token', VARCHAR(200), nullable=False)
     epn_hash = Column('epn_hash', VARCHAR(200), nullable=False)
