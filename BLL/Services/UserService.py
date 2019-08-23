@@ -19,3 +19,6 @@ class UserService:
         return user_repo.add_user(user_data["login"], user_data["password"], user_data["tg_channel"], False,
                                   user_data["vk_token"], user_data["epn_api_token"], user_data["epn_hash"],
                                   int(user_data["start_timer"]), int(user_data["end_timer"]))
+
+    def delete_user(self, user_id):
+        return UserRepository(self.session).delete_user(user_id)
