@@ -26,6 +26,9 @@ class UserRepository:
     def get_user(self, login: str):
         return self.session.query(User).filter(User.login == login).one()
 
+    def get_all_users(self):
+        return self.session.query(User).all()
+
     def delete_user(self, user_id: int):
         self.session.query(Link).filter(Link.user_id == user_id).delete()
         self.session.query(Group).filter(Group.user_id == user_id).delete()

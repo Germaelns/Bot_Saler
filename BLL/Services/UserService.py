@@ -12,6 +12,9 @@ class UserService:
 
         return user_repo.get_user(login)
 
+    def get_all_users(self):
+        return UserRepository(self.session).get_all_users()
+
     def add_user(self, user_data):
 
         user_repo = UserRepository(self.session)

@@ -7,9 +7,8 @@ from BLL.Exeptions.EpnBadDeeplinkHashException import EpnBadDeeplinkHashExceptio
 
 class EPNService:
 
-    def __init__(self, user, group):
+    def __init__(self, user):
         self.user = user
-        self.group = group
 
     @staticmethod
     def __build_request_data(user, vk_items: list):
@@ -64,7 +63,6 @@ class EPNService:
     def __deeplink_customization(group_id, user_id, vk_items, response, counter):
 
         if "error" in response["results"]["rq_" + str(counter)]:
-            print("error")
             if response["results"]["rq_" + str(counter)]["error"] == "Offer not found":
                 raise EpnOfferNotFoundException("No such offer on Aliexpress!")
 
@@ -99,12 +97,12 @@ class EPNService:
 
             try:
                 deeplinks.append(
-                    EPNService.__deeplink_customization(self.group.id, self.group.user_id, vk_items, response,
+                    EPNService.__deeplink_customization(vk_items[counter][2], self.user.id, vk_items, response,
                                                         counter))
             except EpnOfferNotFoundException as e:
-                print(e.message + "for user" + self.group.user_id)
+                print(str(e.message) + "for user " + str(self.user.login))
             except Exception as e:
-                print("EPNService.create_deeplinks error")
+                print(e)
 
             counter = + 1
 

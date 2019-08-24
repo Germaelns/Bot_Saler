@@ -12,11 +12,9 @@ class LinkRepository:
 
     def get_link(self, group_id: int, user_id: int):
         return self.session.query(Link).filter(Link.user_id == user_id
-                                               and Link.group_id == group_id).all()[0]
+                                               and Link.group_id == group_id).all()[-1]
 
     def get_all_links(self, group_id: int, user_id: int) -> list:
         return self.session.query(Link).filter(Link.user_id == user_id
                                                and Link.group_id == group_id).all()
 
-    def delete_link(self, del_link):
-        return self.session.delete(del_link)

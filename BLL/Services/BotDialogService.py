@@ -10,10 +10,6 @@ from BLL.Services.GroupService import GroupService
 from DAL.Entities.User import User
 
 
-# db_session = sessionmaker(bind=db_engine)()
-# self.session.query(User).filter(User.login == login).one()
-
-
 class BotDialogService:
 
     def __init__(self, postgres):
