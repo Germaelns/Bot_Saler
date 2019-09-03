@@ -54,10 +54,8 @@ class BotPostingService:
                         groups = GroupService(session).get_all_groups_for_user(user.id)
 
                         link = list()
-                        no_link = False
 
                         for group in groups:
-
                             try:
                                 link.append(LinkService(session).get_link(group, user))
                                 print(link)
@@ -78,8 +76,6 @@ class BotPostingService:
                             TGService(user, self.bot).post_to_channel(post_data)
                         except IndexError:
                             pass
-
-
 
             session.close()
 
