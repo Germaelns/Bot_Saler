@@ -209,12 +209,13 @@ class BotDialogService:
                     response = requests.post("http://api.epn.bz/json",
                                              data=json.dumps(data),
                                              headers=headers)
-                    if "error" in response.json():
-                        if response.json()["error"] == 'Bad deeplink hash!':
-                            bot.register_next_step_handler(bot.send_message(message.from_user.id,
-                                                                            "Epn не подтвердил наличие хэша, "
-                                                                            "убедитесь в его валидности и введите снова"),
-                                                           registration_epn_hash, user_data=user_data)
+
+                    if response.json()["error"] and response.json()["error"] == 'Bad deeplink hash!':
+                        bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                        "Epn не подтвердил наличие хэша, "
+                                                                        "убедитесь в его валидности и введите снова"),
+                                                       registration_epn_hash, user_data=user_data)
+
                     else:
                         keyboard = telebot.types.ReplyKeyboardMarkup()
                         keyboard.row('Выйти')
