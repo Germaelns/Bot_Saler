@@ -15,11 +15,11 @@ from BLL.Services.GroupService import GroupService
 
 class BotPostingService:
 
-    def __init__(self, postgres, bot):
+    def __init__(self, postgres, bot_instance):
         self.db_engine = create_engine(f"postgres://{postgres['user']}:{postgres['password']}@"
                                        f"{postgres['host']}:{postgres['port']}/{postgres['db']}",
                                        pool_pre_ping=True)
-        self.bot = bot
+        self.bot_instance = bot_instance
 
     def bot_posting(self):
 
@@ -73,11 +73,11 @@ class BotPostingService:
                                 "image": link[0].image
                             }
 
-                            TGService(user, self.bot).post_to_channel(post_data)
+                            TGService(user, self.bot_instance).post_to_channel(post_data)
                         except IndexError:
                             pass
 
             session.close()
 
-            print("waiting...")
+            print("Waiting...")
             time.sleep(900 - (int(time.time()) - int(start_time)))

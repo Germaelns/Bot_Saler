@@ -23,7 +23,6 @@ class BotDialogService:
         def start_message(message):
             keyboard = telebot.types.ReplyKeyboardMarkup()
             keyboard.row('Войти', 'Регистрация')
-            keyboard.row('Выйти')
 
             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                             "Добрый день, выберите необходимую опцию",
@@ -34,29 +33,28 @@ class BotDialogService:
             user_data = dict()
             if message.text == "Регистрация":
                 keyboard = telebot.types.ReplyKeyboardMarkup()
-                keyboard.row('Выйти')
+                keyboard.row('На главную')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Введите желаемый логин",
                                                                 reply_markup=keyboard),
                                                registration_login, user_data=user_data)
             elif message.text == "Войти":
                 keyboard = telebot.types.ReplyKeyboardMarkup()
-                keyboard.row('Выйти')
+                keyboard.row('На главную')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Введите свой логин",
                                                                 reply_markup=keyboard),
                                                check_login)
-            elif message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
 
         def registration_login(message, user_data):
 
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
             else:
                 try:
                     session = sessionmaker(bind=self.db_engine)()
@@ -67,7 +65,7 @@ class BotDialogService:
                                                    registration_login, user_data=user_data)
                 except NoResultFound:
                     keyboard = telebot.types.ReplyKeyboardMarkup()
-                    keyboard.row('Выйти')
+                    keyboard.row('Назад', 'На главную')
                     user_data["login"] = message.text
                     bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                     "Введите желаемый пароль",
@@ -75,13 +73,24 @@ class BotDialogService:
                                                    registration_password, user_data=user_data)
 
         def registration_password(message, user_data):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
+            elif message.text == "Назад":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('На главную')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                f"Введён логин:{user_data['login']}\n"
+                                                                f"Введите желаемый логин",
+                                                                reply_markup=keyboard),
+                                               registration_login, user_data=user_data)
             else:
                 keyboard = telebot.types.ReplyKeyboardMarkup()
-                keyboard.row('Выйти')
+                keyboard.row('Назад', 'На главную')
                 user_data["password"] = message.text
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Введите свой телеграм канал по типу @channel",
@@ -89,10 +98,21 @@ class BotDialogService:
                                                registration_tg_channel, user_data=user_data)
 
         def registration_tg_channel(message, user_data):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
+            elif message.text == "Назад":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Назад', 'На главную')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                f"Введён пароль:{user_data['password']}\n"
+                                                                f"Введите желаемый пароль",
+                                                                reply_markup=keyboard),
+                                               registration_password, user_data=user_data)
             else:
                 try:
                     session = sessionmaker(bind=self.db_engine)()
@@ -103,7 +123,7 @@ class BotDialogService:
                                                    registration_tg_channel, user_data=user_data)
                 except NoResultFound:
                     keyboard = telebot.types.ReplyKeyboardMarkup()
-                    keyboard.row('Выйти')
+                    keyboard.row('Назад', 'На главную')
                     user_data["tg_channel"] = message.text
                     bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                     "Введите свой токен приложения вконтакте",
@@ -111,10 +131,21 @@ class BotDialogService:
                                                    registration_vk_token, user_data=user_data)
 
         def registration_vk_token(message, user_data):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
+            elif message.text == "Назад":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Назад', 'На главную')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                f"Введён канал:{user_data['tg_channel']}\n"
+                                                                f"Введите желаемый канал",
+                                                                reply_markup=keyboard),
+                                               registration_tg_channel, user_data=user_data)
             else:
                 try:
                     session = sessionmaker(bind=self.db_engine)()
@@ -125,7 +156,7 @@ class BotDialogService:
                                                    registration_vk_token, user_data=user_data)
                 except NoResultFound:
                     keyboard = telebot.types.ReplyKeyboardMarkup()
-                    keyboard.row('Выйти')
+                    keyboard.row('Назад', 'На главную')
                     user_data["vk_token"] = message.text
                     bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                     "Введите свой токен приложения EPN",
@@ -133,17 +164,31 @@ class BotDialogService:
                                                    registration_epn_api_token, user_data=user_data)
 
         def registration_epn_api_token(message, user_data):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
+            elif message.text == "Назад":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Назад', 'На главную')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                f"Введён токен ВК:{user_data['vk_token']}\n"
+                                                                f"Введите новый токен",
+                                                                reply_markup=keyboard),
+                                               registration_vk_token, user_data=user_data)
             else:
                 try:
                     session = sessionmaker(bind=self.db_engine)()
                     session.query(User).filter(User.epn_api_token == message.text).one()
                     session.close()
+                    keyboard = telebot.types.ReplyKeyboardMarkup()
+                    keyboard.row('Назад', 'На главную')
                     bot.register_next_step_handler(bot.send_message(message.from_user.id,
-                                                                    "Этот токен EPN уже используется, введите другой"),
+                                                                    "Этот токен EPN уже используется, введите другой",
+                                                                    reply_markup=keyboard),
                                                    registration_epn_api_token, user_data=user_data)
                 except NoResultFound:
                     import requests
@@ -166,24 +211,37 @@ class BotDialogService:
                     if "error" in response.json():
                         if response.json()["error"] == 'Bad deeplink hash!':
                             keyboard = telebot.types.ReplyKeyboardMarkup()
-                            keyboard.row('Выйти')
+                            keyboard.row('Назад', 'На главную')
                             user_data["epn_api_token"] = message.text
                             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                             "Введите свой хэш приложения EPN",
                                                                             reply_markup=keyboard),
                                                            registration_epn_hash, user_data=user_data)
                         elif response.json()["error"] == 'Bad auth data!':
+                            keyboard = telebot.types.ReplyKeyboardMarkup()
+                            keyboard.row('Назад', 'На главную')
                             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                             "Epn не подтвердил наличие токена, "
                                                                             "убедитесь в его валидности и попробуйте "
-                                                                            "ввести снова"),
+                                                                            "ввести снова", reply_markup=keyboard),
                                                            registration_epn_api_token, user_data=user_data)
 
         def registration_epn_hash(message, user_data):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
+            elif message.text == "Назад":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Назад', 'На главную')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                f"Введён токен приложения EPN:{user_data['epn_api_token']}\n"
+                                                                f"Введите новый токен",
+                                                                reply_markup=keyboard),
+                                               registration_epn_api_token, user_data=user_data)
             else:
                 try:
                     session = sessionmaker(bind=self.db_engine)()
@@ -212,14 +270,17 @@ class BotDialogService:
 
                     if 'error' in response.json():
                         if response.json()["error"] == 'Bad deeplink hash!':
+                            keyboard = telebot.types.ReplyKeyboardMarkup()
+                            keyboard.row('Назад', 'На главную')
                             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                             "Epn не подтвердил наличие хэша, "
-                                                                            "убедитесь в его валидности и введите снова"),
+                                                                            "убедитесь в его валидности и введите снова",
+                                                                            reply_markup=keyboard),
                                                            registration_epn_hash, user_data=user_data)
 
                     else:
                         keyboard = telebot.types.ReplyKeyboardMarkup()
-                        keyboard.row('Выйти')
+                        keyboard.row('Назад', 'На главную')
                         user_data["epn_hash"] = message.text
                         bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                         "Введите время работы бота на вашем канале по типу "
@@ -251,41 +312,57 @@ class BotDialogService:
                                      reply_markup=delete_keyboard)
 
         def check_login(message):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
             else:
                 session = sessionmaker(bind=self.db_engine)()
                 try:
                     user = UserService(session).get_user(message.text)
                     session.close()
                     keyboard = telebot.types.ReplyKeyboardMarkup()
-                    keyboard.row('Выйти')
+                    keyboard.row('На главную')
                     bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                     "Введите свой пароль",
                                                                     reply_markup=keyboard),
                                                    check_password, user=user)
                 except NoResultFound:
                     session.close()
-                    bot.send_message(message.from_user.id, "Пользователя с таким логином не существует")
+                    keyboard = telebot.types.ReplyKeyboardMarkup()
+                    keyboard.row('Войти', 'Регистрация')
+                    bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                    'Пользователя с таким логином не существует!',
+                                                                    reply_markup=keyboard),
+                                                   first_choice)
 
         def check_password(message, user):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Стартовая страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
             else:
                 if message.text == user.password:
                     keyboard = telebot.types.ReplyKeyboardMarkup()
                     keyboard.row('Оплата', 'Меню')
-                    keyboard.row('Выйти')
+                    keyboard.row('На главную')
                     bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                     "Выберите опцию",
                                                                     reply_markup=keyboard),
                                                    main_menu, login=user.login)
                 else:
-                    bot.send_message(message.from_user.id, "Пароль неверный")
+                    keyboard = telebot.types.ReplyKeyboardMarkup()
+                    keyboard.row('На главную')
+                    bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                    'Пароль неверный!\n Попробуйте снова',
+                                                                    reply_markup=keyboard),
+                                                   check_password, user=user)
 
         def main_menu(message, login):
             if message.text == "Оплата":
@@ -301,10 +378,13 @@ class BotDialogService:
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Выберите опцию", reply_markup=keyboard),
                                                menu, login=login)
-            elif message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            elif message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
 
         def payment(message, login):
             keyboard = telebot.types.ReplyKeyboardMarkup()
@@ -490,8 +570,10 @@ class BotDialogService:
 
             if message.text == "Отмена":
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
-                                                                "Удаление отменено!", reply_markup=keyboard),
-                                               menu, login=login)
+                                                                "Удаление отменено!",
+                                                                reply_markup=keyboard),
+                                               menu,
+                                               login=login)
             else:
                 session = sessionmaker(bind=self.db_engine)()
                 user = UserService(session).get_user(login)
