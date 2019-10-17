@@ -291,10 +291,21 @@ class BotDialogService:
                     print(e)
 
         def registration_post_time(message, user_data):
-            if message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            if message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
+            elif message.text == "Назад":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Назад', 'На главную')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                f"Введён хэш приложения EPN:{user_data['epn_hash']}\n"
+                                                                f"Введите новый хэш",
+                                                                reply_markup=keyboard),
+                                               registration_epn_api_token, user_data=user_data)
             else:
                 if ":" in message.text:
                     time = message.text.split(':')
@@ -307,9 +318,12 @@ class BotDialogService:
                     session.commit()
                     session.close()
 
-                    delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                    bot.send_message(message.from_user.id, "Пользователь успешно зарегистрирован!",
-                                     reply_markup=delete_keyboard)
+                    keyboard = telebot.types.ReplyKeyboardMarkup()
+                    keyboard.row('Войти', 'Регистрация')
+                    bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                    'Пользователь успешно зарегистрирован',
+                                                                    reply_markup=keyboard),
+                                                   first_choice)
 
         def check_login(message):
             if message.text == "На главную":
@@ -344,7 +358,7 @@ class BotDialogService:
                 keyboard = telebot.types.ReplyKeyboardMarkup()
                 keyboard.row('Войти', 'Регистрация')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
-                                                                'Стартовая страница',
+                                                                'Главная страница',
                                                                 reply_markup=keyboard),
                                                first_choice)
             else:
@@ -366,15 +380,19 @@ class BotDialogService:
 
         def main_menu(message, login):
             if message.text == "Оплата":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Оплата', 'Меню')
+                keyboard.row('На главную')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
-                                                                "Услуга недоступна"),
-                                               payment, login=login)
+                                                                "Услуга недоступна, выберите другую опцию",
+                                                                reply_markup=keyboard),
+                                               main_menu, login=login)
             elif message.text == "Меню":
                 keyboard = telebot.types.ReplyKeyboardMarkup()
                 keyboard.row('Включить', 'Отключить')
                 keyboard.row('Добавить группу', 'Удалить группу')
                 keyboard.row('Изменить частоту', 'Изменить промежутки')
-                keyboard.row('Выйти', 'Удалить пользователя')
+                keyboard.row('На главную', 'Удалить пользователя')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Выберите опцию", reply_markup=keyboard),
                                                menu, login=login)
@@ -386,14 +404,14 @@ class BotDialogService:
                                                                 reply_markup=keyboard),
                                                first_choice)
 
-        def payment(message, login):
-            keyboard = telebot.types.ReplyKeyboardMarkup()
-            keyboard.row('Оплата', 'Меню')
-            keyboard.row('Выйти')
-            bot.register_next_step_handler(bot.send_message(message.from_user.id,
-                                                            "Выберите опцию",
-                                                            reply_markup=keyboard),
-                                           main_menu, login=login)
+        # def payment(message, login):
+        #     keyboard = telebot.types.ReplyKeyboardMarkup()
+        #     keyboard.row('Оплата', 'Меню')
+        #     keyboard.row('На главную')
+        #     bot.register_next_step_handler(bot.send_message(message.from_user.id,
+        #                                                     "Выберите опцию",
+        #                                                     reply_markup=keyboard),
+        #                                    main_menu, login=login)
 
         def menu(message, login):
             if message.text == "Включить":
@@ -426,10 +444,13 @@ class BotDialogService:
                                                                     "Бот уже отключён!"),
                                                    menu, login=login)
                     session.close()
-            elif message.text == "Выйти":
-                delete_keyboard = types.ReplyKeyboardRemove(selective=False)
-                bot.send_message(message.from_user.id, "Спасибо что пользуетесь нашими услугами",
-                                 reply_markup=delete_keyboard)
+            elif message.text == "На главную":
+                keyboard = telebot.types.ReplyKeyboardMarkup()
+                keyboard.row('Войти', 'Регистрация')
+                bot.register_next_step_handler(bot.send_message(message.from_user.id,
+                                                                'Главная страница',
+                                                                reply_markup=keyboard),
+                                               first_choice)
             elif message.text == "Добавить группу":
                 delete_keyboard = types.ReplyKeyboardRemove(selective=False)
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
@@ -444,8 +465,8 @@ class BotDialogService:
                                                delete_group, login=login)
             elif message.text == "Изменить частоту":
                 keyboard = telebot.types.ReplyKeyboardMarkup()
-                keyboard.row('Раз в 1 час', 'Раз в 2 часа')
-                keyboard.row('Раз в 3 часа')
+                keyboard.row('Раз в 30 минут', 'Раз в 1 час')
+                keyboard.row('Раз в 2 часа', 'Раз в 3 часа')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Выберите опцию",
                                                                 reply_markup=keyboard),
@@ -483,7 +504,7 @@ class BotDialogService:
             keyboard.row('Включить', 'Отключить')
             keyboard.row('Добавить группу', 'Удалить группу')
             keyboard.row('Изменить частоту', 'Изменить промежутки')
-            keyboard.row('Выйти', 'Удалить пользователя')
+            keyboard.row('На главную', 'Удалить пользователя')
             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                             "Группа успешно добавлена", reply_markup=keyboard),
                                            menu, login=login)
@@ -502,7 +523,7 @@ class BotDialogService:
                 keyboard.row('Включить', 'Отключить')
                 keyboard.row('Добавить группу', 'Удалить группу')
                 keyboard.row('Изменить частоту', 'Изменить промежутки')
-                keyboard.row('Выйти', 'Удалить пользователя')
+                keyboard.row('На главную', 'Удалить пользователя')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Группа успешно удалена", reply_markup=keyboard),
                                                menu, login=login)
@@ -513,7 +534,7 @@ class BotDialogService:
                 keyboard.row('Включить', 'Отключить')
                 keyboard.row('Добавить группу', 'Удалить группу')
                 keyboard.row('Изменить частоту', 'Изменить промежутки')
-                keyboard.row('Выйти', 'Удалить пользователя')
+                keyboard.row('На главную', 'Удалить пользователя')
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                                 "Группы не существует", reply_markup=keyboard),
                                                menu, login=login)
@@ -521,12 +542,16 @@ class BotDialogService:
         def change_periodicity(message, login):
             session = sessionmaker(bind=self.db_engine)()
             user = UserService(session).get_user(login)
-            if message.text == "Раз в 1 час":
+            if message.text == "Раз в 30 минут":
+                user.post_iteration = 2
+            elif message.text == "Раз в 1 час":
                 user.post_iteration = 4
             elif message.text == "Раз в 2 часа":
                 user.post_iteration = 8
             elif message.text == "Раз в 3 часа":
                 user.post_iteration = 12
+            else:
+                user.post_iteration = 4
             session.commit()
             session.close()
 
@@ -534,7 +559,7 @@ class BotDialogService:
             keyboard.row('Включить', 'Отключить')
             keyboard.row('Добавить группу', 'Удалить группу')
             keyboard.row('Изменить частоту', 'Изменить промежутки')
-            keyboard.row('Выйти', 'Удалить пользователя')
+            keyboard.row('На главную', 'Удалить пользователя')
             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                             "Время успешно изменено!", reply_markup=keyboard),
                                            menu, login=login)
@@ -555,7 +580,7 @@ class BotDialogService:
             keyboard.row('Включить', 'Отключить')
             keyboard.row('Добавить группу', 'Удалить группу')
             keyboard.row('Изменить частоту', 'Изменить промежутки')
-            keyboard.row('Выйти', 'Удалить пользователя')
+            keyboard.row('На главную', 'Удалить пользователя')
             bot.register_next_step_handler(bot.send_message(message.from_user.id,
                                                             "Время успешно изменено!", reply_markup=keyboard),
                                            menu, login=login)
@@ -566,7 +591,7 @@ class BotDialogService:
             keyboard.row('Включить', 'Отключить')
             keyboard.row('Добавить группу', 'Удалить группу')
             keyboard.row('Изменить частоту', 'Изменить промежутки')
-            keyboard.row('Выйти', 'Удалить пользователя')
+            keyboard.row('На главную', 'Удалить пользователя')
 
             if message.text == "Отмена":
                 bot.register_next_step_handler(bot.send_message(message.from_user.id,
